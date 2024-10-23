@@ -12,18 +12,6 @@ firefox_options.set_preference("general.useragent.override",
 # firefox_options.add_argument("--headless")
 firefox_options.add_argument("--width=375")
 firefox_options.add_argument("--height=812")
-driver = webdriver.Firefox(options=firefox_options)
-
-console_logger = """
-window.logs = [];
-const originalLog = console.log;
-console.log = function() {
-    window.logs.push(Array.from(arguments).join(' '));
-    originalLog.apply(console, arguments);
-};
-"""
-driver.execute_script(console_logger)
-driver.get('https://huntthemouse.sqkii.com')
 
 def get_console_logs():
     logs = driver.execute_script("return window.logs || []")
@@ -99,29 +87,33 @@ def click_yes():
     yes_button.click()
     print("Successfully clicked 'Yes' button")
 
-try:
-    init_print_click()
-    click_skip()
-    click_letsgo()
-    time.sleep(1)
-    click_i_agree()
-    for _ in range(2):
-        click_map(290, 323)
-        time.sleep(1.25)
+while True:
     try:
+        driver = webdriver.Firefox(options=firefox_options)
+        driver.get('https://huntthemouse.sqkii.com')
+        init_print_click()
+        click_skip()
+        click_letsgo()
+        time.sleep(1)
         click_i_agree()
+        for _ in range(2):
+            click_map(290, 323)
+            time.sleep(1.25)
+        try:
+            click_i_agree()
+        except Exception as e:
+            print(f"First attempt to click agree failed: {e}")
+            time.sleep(2)  # Wait longer and try again
+            click_i_agree()
+
+        click_shrink_circle()
+        click_yes()
+        # click_yes()
+
     except Exception as e:
-        print(f"First attempt to click agree failed: {e}")
-        time.sleep(2)  # Wait longer and try again
-        click_i_agree()
+        print(f"Error occurred: {e}")
+        time.sleep(3)
 
-    click_shrink_circle()
-    click_yes()
-    # click_yes()
-
-except Exception as e:
-    print(f"Error occurred: {e}")
-
-finally:
-    get_console_logs()
-    # driver.quit()
+    finally:
+        get_console_logs()
+        driver.quit()
