@@ -4,12 +4,13 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+from PIL import Image
 usleep = lambda x: time.sleep(x/1000000.0)
 
 firefox_options = Options()
 firefox_options.set_preference("general.useragent.override", 
                                "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1")
-# firefox_options.add_argument("--headless")
+firefox_options.add_argument("--headless")
 firefox_options.add_argument("--width=375")
 firefox_options.add_argument("--height=812")
 
@@ -87,7 +88,9 @@ def click_yes():
     yes_button.click()
     print("Successfully clicked 'Yes' button")
 
+counter = 0
 while True:
+    counter += 1
     try:
         driver = webdriver.Firefox(options=firefox_options)
         driver.get('https://huntthemouse.sqkii.com')
@@ -112,8 +115,10 @@ while True:
 
     except Exception as e:
         print(f"Error occurred: {e}")
-        time.sleep(3)
 
     finally:
-        get_console_logs()
+        time.sleep(3)
+        driver.save_screenshot(f"screenshot_{counter}.png")
+        # screenshot = Image.open(f"screenshot_{counter}.png")
+        # screenshot.show()
         driver.quit()
